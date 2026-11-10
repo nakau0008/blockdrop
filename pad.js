@@ -45,6 +45,11 @@
     setVisible(v) {
       document.body.classList.toggle('pad-off', !v);
     },
+    // Unity から呼ばれる: 必殺技が出せる時は必殺技ボタンを光らせる
+    setSpReady(v) {
+      const b = document.querySelector('#pad .sp');
+      if (b) b.classList.toggle('ready', v);
+    },
   };
 
   window.addEventListener('DOMContentLoaded', () => {

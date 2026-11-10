@@ -20,10 +20,11 @@
   #pad { display: none; }
   body.touch #pad { display: block; }
   body.touch.pad-off #pad { display: none; }
-  :root { --b: min(19vw, 78px); --g: 10px; }
-  @media (orientation: landscape) { :root { --b: min(17vh, 70px); --g: 8px; } }
+  :root { --b: min(16vw, 72px); --g: 8px; }
+  @media (orientation: landscape) { :root { --b: min(16vh, 66px); --g: 8px; } }
   #pad .grp { position: fixed; bottom: calc(12px + env(safe-area-inset-bottom)); display: grid;
               grid-template-columns: repeat(2, var(--b)); grid-auto-rows: var(--b); gap: var(--g); }
+  #pad .grp.l { grid-template-columns: repeat(3, var(--b)); } /* 矢印キーと同じ逆T字 */
   #pad .l { left: calc(12px + env(safe-area-inset-left)); }
   #pad .r { right: calc(12px + env(safe-area-inset-right)); }
   #pad button { margin: 0; padding: 0; border-radius: 16px; touch-action: none;
@@ -39,7 +40,16 @@
              width: calc(2 * var(--b) + var(--g)); height: calc(var(--b) * 0.62); border-radius: 14px;
              background: linear-gradient(90deg, rgba(255,120,160,.35), rgba(255,220,90,.35), rgba(120,220,255,.35), rgba(190,140,255,.35));
              border-color: rgba(255,255,255,.6); color: #fff; letter-spacing: .08em; }
+  #pad .sp { opacity: .55; transition: opacity .2s; }
   #pad .sp.on { background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff); color: #111; }
+  /* 必殺技が出せる時: 虹色に光って脈打つ */
+  #pad .sp.ready { opacity: 1; color: #111; border-color: #fff;
+                   background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff, #ff78a0); background-size: 300% 100%;
+                   animation: spflow 1.2s linear infinite, sppulse .8s ease-in-out infinite; }
+  @keyframes spflow { to { background-position: 300% 0; } }
+  @keyframes sppulse {
+    0%, 100% { box-shadow: 0 0 6px 2px rgba(255,255,255,.5), 0 0 18px 6px rgba(255,180,90,.45); transform: scale(1); }
+    50%      { box-shadow: 0 0 14px 5px rgba(255,255,255,.9), 0 0 36px 14px rgba(150,200,255,.7); transform: scale(1.06); } }
   #pad .pause { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right));
                 width: 44px; height: 44px; border-radius: 12px; font-size: 16px; }
   #l { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -69,7 +79,7 @@
   #mm-status.err { color: #ff8f9f; }
 </style>
 </head>
-<body>
+<body class="pad-off">
 <canvas id="c" tabindex="-1"></canvas>
 <div id="l">読み込み中… 0%</div>
 <div id="mm" hidden>
@@ -87,15 +97,19 @@
   </div>
 </div>
 <div id="pad" aria-hidden="true">
+  <!-- 左手: PCの矢印キーと同じ並び（▲=右回転, ◀▶=移動, ▼=ゆっくり落とす） -->
   <div class="grp l">
-    <button data-k="hold">ホールド</button>
-    <button data-k="soft" class="big">▼</button>
+    <span></span>
+    <button data-k="cw" class="big">▲</button>
+    <span></span>
     <button data-k="left" class="big">◀</button>
+    <button data-k="soft" class="big">▼</button>
     <button data-k="right" class="big">▶</button>
   </div>
+  <!-- 右手: Z=左回転, C=ホールド, Space=落とす, F=必殺技 -->
   <div class="grp r">
     <button data-k="ccw" class="big">↺</button>
-    <button data-k="cw" class="big">↻</button>
+    <button data-k="hold">ホールド</button>
     <button data-k="hard" class="drop">落とす</button>
   </div>
   <button data-k="sp" class="sp">必殺技</button>
