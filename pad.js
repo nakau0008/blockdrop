@@ -41,6 +41,10 @@
     onUnityReady() {
       if (isTouch) toUnity('OnTouchDevice', '1');
     },
+    // Unity から呼ばれる: プレイ中だけ操作ボタンを出す
+    setVisible(v) {
+      document.body.classList.toggle('pad-off', !v);
+    },
   };
 
   window.addEventListener('DOMContentLoaded', () => {

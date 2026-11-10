@@ -19,6 +19,7 @@
   /* スマホ用タッチボタン（pad.js が body.touch を付けたときだけ表示） */
   #pad { display: none; }
   body.touch #pad { display: block; }
+  body.touch.pad-off #pad { display: none; }
   :root { --b: min(19vw, 78px); --g: 10px; }
   @media (orientation: landscape) { :root { --b: min(17vh, 70px); --g: 8px; } }
   #pad .grp { position: fixed; bottom: calc(12px + env(safe-area-inset-bottom)); display: grid;
