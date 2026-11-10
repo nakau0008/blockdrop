@@ -157,6 +157,14 @@ var Module=typeof unityFramework!="undefined"?unityFramework:{};var readyPromise
     for (var i = 0; i < btns.length; i++) bindPad(btns[i]);
     bindDialog();
 
+    // ゲーム画面がキー入力のフォーカスを受け取れるようにする（ページによっては tabindex が無い）
+    var gc = getCanvas();
+    if (gc) {
+      if (!gc.hasAttribute('tabindex')) gc.setAttribute('tabindex', '-1');
+      gc.style.outline = 'none';
+      gc.addEventListener('pointerdown', function () { try { window.focus(); gc.focus(); } catch (e) {} });
+    }
+
     syncOverlay();
     window.addEventListener('resize', syncOverlay);
     window.addEventListener('scroll', syncOverlay, true);
