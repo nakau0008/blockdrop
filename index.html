@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlockDrop</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0a0d17; overflow: hidden; }
+  #c { width: 100vw; height: 100vh; display: block; outline: none; }
+  #l { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+       color: #7fd8ff; font: 600 20px system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<canvas id="c" tabindex="-1"></canvas>
+<div id="l">Loading... 0%</div>
+<script src="Build/blockdrop-web.loader.js"></script>
+<script>
+  const c = document.getElementById('c'), l = document.getElementById('l');
+  createUnityInstance(c, {
+    dataUrl: 'Build/blockdrop-web.data',
+    frameworkUrl: 'Build/blockdrop-web.framework.js',
+    codeUrl: 'Build/blockdrop-web.wasm',
+    streamingAssetsUrl: 'StreamingAssets',
+    companyName: 'BlockDrop', productName: 'BlockDrop', productVersion: '1.0',
+  }, p => { l.textContent = 'Loading... ' + Math.round(p * 100) + '%'; })
+  .then(() => { l.remove(); c.focus(); })
+  .catch(e => { l.textContent = String(e); });
+  window.addEventListener('pointerdown', () => c.focus());
+</script>
+</body>
+</html>
