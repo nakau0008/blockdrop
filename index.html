@@ -11,115 +11,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; height: 100%; background: #0a0d17; overflow: hidden;
-               overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
-  body.touch { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  html, body { margin: 0; height: 100%; background: #0a0d17; overflow: hidden; touch-action: none;
+               overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+               -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   #c { width: 100vw; height: 100vh; height: 100dvh; display: block; outline: none; }
-
-  /* スマホ用タッチボタン（pad.js が body.touch を付けたときだけ表示） */
-  #pad { display: none; }
-  body.touch #pad { display: block; }
-  body.touch.pad-off #pad { display: none; }
-  :root { --b: min(16vw, 72px); --g: 8px; }
-  @media (orientation: landscape) { :root { --b: min(16vh, 66px); --g: 8px; } }
-  #pad .grp { position: fixed; bottom: calc(12px + env(safe-area-inset-bottom)); display: grid;
-              grid-template-columns: repeat(2, var(--b)); grid-auto-rows: var(--b); gap: var(--g); }
-  #pad .grp.l { grid-template-columns: repeat(3, var(--b)); } /* 矢印キーと同じ逆T字 */
-  #pad .l { left: calc(12px + env(safe-area-inset-left)); }
-  #pad .r { right: calc(12px + env(safe-area-inset-right)); }
-  #pad button { margin: 0; padding: 0; border-radius: 16px; touch-action: none;
-                background: rgba(127, 216, 255, 0.13); border: 1.5px solid rgba(127, 216, 255, 0.45);
-                color: #dff4ff; font: 400 clamp(11px, 2.9vw, 17px) 'Dela Gothic One', system-ui, sans-serif; white-space: nowrap;
-                display: flex; align-items: center; justify-content: center; }
-  #pad button.big { font-size: clamp(22px, 6vw, 32px); }
-  #pad button.drop { grid-column: span 2; background: rgba(255, 143, 180, 0.16); border-color: rgba(255, 143, 180, 0.55); color: #ffe0ea; }
-  #pad button.on { background: rgba(127, 216, 255, 0.5); transform: scale(0.96); }
-  #pad button.drop.on { background: rgba(255, 143, 180, 0.5); }
-  #pad .sp { position: fixed; right: calc(12px + env(safe-area-inset-right));
-             bottom: calc(12px + env(safe-area-inset-bottom) + 2 * var(--b) + 2 * var(--g));
-             width: calc(2 * var(--b) + var(--g)); height: calc(var(--b) * 0.62); border-radius: 14px;
-             background: linear-gradient(90deg, rgba(255,120,160,.35), rgba(255,220,90,.35), rgba(120,220,255,.35), rgba(190,140,255,.35));
-             border-color: rgba(255,255,255,.6); color: #fff; letter-spacing: .08em; }
-  #pad .sp { opacity: .55; transition: opacity .2s; }
-  #pad .sp.on { background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff); color: #111; }
-  /* 必殺技が出せる時: 虹色に光って脈打つ */
-  #pad .sp.ready { opacity: 1; color: #111; border-color: #fff;
-                   background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff, #ff78a0); background-size: 300% 100%;
-                   animation: spflow 1.2s linear infinite, sppulse .8s ease-in-out infinite; }
-  @keyframes spflow { to { background-position: 300% 0; } }
-  @keyframes sppulse {
-    0%, 100% { box-shadow: 0 0 6px 2px rgba(255,255,255,.5), 0 0 18px 6px rgba(255,180,90,.45); transform: scale(1); }
-    50%      { box-shadow: 0 0 14px 5px rgba(255,255,255,.9), 0 0 36px 14px rgba(150,200,255,.7); transform: scale(1.06); } }
-  #pad .pause { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right));
-                width: 44px; height: 44px; border-radius: 12px; font-size: 16px; }
   #l { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
        font: 400 26px 'Dela Gothic One', system-ui, sans-serif; letter-spacing: .06em;
        background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff, #ff78a0); background-size: 200% 100%;
        -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 1.5s linear infinite; }
   @keyframes shine { to { background-position: 200% 0; } }
-  #mm { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
-        background: rgba(4, 6, 12, 0.55); font-family: system-ui, sans-serif; }
-  #mm h2, #mm button { font-family: 'Dela Gothic One', system-ui, sans-serif; font-weight: 400; }
-  #mm[hidden] { display: none; }
-  #mm .box { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 28px 28px 22px;
-             background: #141a2b; border: 1px solid #3a4468; border-radius: 14px; color: #e8ecff;
-             box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-  #mm h2 { margin: 0 0 6px; font-size: 22px; color: #ffbfd6; }
-  #mm .sub { margin: 0 0 18px; font-size: 14px; color: #9aa3c7; line-height: 1.5; }
-  #mm input { width: 100%; box-sizing: border-box; padding: 12px 14px; font-size: 18px; border-radius: 8px;
-              border: 1px solid #3a4468; background: #0b0f1c; color: #fff; outline: none; }
-  #mm input:focus { border-color: #7fd8ff; }
-  #mm .row { display: flex; gap: 10px; margin-top: 14px; }
-  #mm button { flex: 1; padding: 11px; font-size: 15px; font-weight: 600; border-radius: 8px; cursor: pointer;
-               border: 1px solid #7fd8ff; background: #7fd8ff; color: #0b0f1c; }
-  #mm button.ghost { background: transparent; color: #9aa3c7; border-color: #3a4468; }
-  #mm button:disabled { opacity: .5; cursor: default; }
-  #mm button[hidden] { display: none; }
-  #mm-status { min-height: 1.5em; margin: 14px 0 0; font-size: 14px; color: #c9d2ff; white-space: pre-line; line-height: 1.5; }
-  #mm-status.err { color: #ff8f9f; }
 </style>
 </head>
-<body class="pad-off">
+<body>
 <canvas id="c" tabindex="-1"></canvas>
 <div id="l">読み込み中… 0%</div>
-<div id="mm" hidden>
-  <div class="box" role="dialog" aria-labelledby="mm-title">
-    <h2 id="mm-title">オンライン対戦</h2>
-    <p class="sub" id="mm-sub">相手と同じ合言葉を入力すると、つながります。</p>
-    <div id="mm-phrase">
-      <input id="mm-input" maxlength="40" placeholder="合言葉（例：sakura42）" autocomplete="off">
-    </div>
-    <div class="row">
-      <button id="mm-go">マッチング開始</button>
-      <button id="mm-cancel" class="ghost">キャンセル</button>
-    </div>
-    <p id="mm-status"></p>
-  </div>
-</div>
-<div id="pad" aria-hidden="true">
-  <!-- 左手: PCの矢印キーと同じ並び（▲=右回転, ◀▶=移動, ▼=ゆっくり落とす） -->
-  <div class="grp l">
-    <span></span>
-    <button data-k="cw" class="big">▲</button>
-    <span></span>
-    <button data-k="left" class="big">◀</button>
-    <button data-k="soft" class="big">▼</button>
-    <button data-k="right" class="big">▶</button>
-  </div>
-  <!-- 右手: Z=左回転, C=ホールド, Space=落とす, F=必殺技 -->
-  <div class="grp r">
-    <button data-k="ccw" class="big">↺</button>
-    <button data-k="hold">ホールド</button>
-    <button data-k="hard" class="drop">落とす</button>
-  </div>
-  <button data-k="sp" class="sp">必殺技</button>
-  <button data-k="pause" class="pause">II</button>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
-<script src="lobby.js"></script>
-<script src="net.js"></script>
-<script src="pad.js"></script>
 <script src="Build/blockdrop-web.loader.js"></script>
 <script>
   const c = document.getElementById('c'), l = document.getElementById('l');
@@ -130,7 +35,7 @@
     streamingAssetsUrl: 'StreamingAssets',
     companyName: 'BlockDrop', productName: 'BlockDrop', productVersion: '1.0',
   }, p => { l.textContent = '読み込み中… ' + Math.round(p * 100) + '%'; })
-  .then(u => { window.unityInstance = u; l.remove(); c.focus(); window.BlockDropPad.onUnityReady(); })
+  .then(u => { window.unityInstance = u; l.remove(); c.focus(); })
   .catch(e => { l.textContent = String(e); });
   c.addEventListener('pointerdown', () => c.focus());
 </script>
