@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0d17">
 <title>BlockDrop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; height: 100%; background: #0a0d17; overflow: hidden;
                overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
@@ -24,7 +27,7 @@
   #pad .r { right: calc(12px + env(safe-area-inset-right)); }
   #pad button { margin: 0; padding: 0; border-radius: 16px; touch-action: none;
                 background: rgba(127, 216, 255, 0.13); border: 1.5px solid rgba(127, 216, 255, 0.45);
-                color: #dff4ff; font: 700 clamp(13px, 3.4vw, 20px) system-ui, sans-serif;
+                color: #dff4ff; font: 400 clamp(12px, 3.2vw, 18px) 'Dela Gothic One', system-ui, sans-serif;
                 display: flex; align-items: center; justify-content: center; }
   #pad button.big { font-size: clamp(22px, 6vw, 32px); }
   #pad button.drop { grid-column: span 2; background: rgba(255, 143, 180, 0.16); border-color: rgba(255, 143, 180, 0.55); color: #ffe0ea; }
@@ -39,12 +42,13 @@
   #pad .pause { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right));
                 width: 44px; height: 44px; border-radius: 12px; font-size: 16px; }
   #l { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-       font: 800 22px system-ui, sans-serif; letter-spacing: .06em;
+       font: 400 26px 'Dela Gothic One', system-ui, sans-serif; letter-spacing: .06em;
        background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff, #ff78a0); background-size: 200% 100%;
        -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 1.5s linear infinite; }
   @keyframes shine { to { background-position: 200% 0; } }
   #mm { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
         background: rgba(4, 6, 12, 0.55); font-family: system-ui, sans-serif; }
+  #mm h2, #mm button { font-family: 'Dela Gothic One', system-ui, sans-serif; font-weight: 400; }
   #mm[hidden] { display: none; }
   #mm .box { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 28px 28px 22px;
              background: #141a2b; border: 1px solid #3a4468; border-radius: 14px; color: #e8ecff;
@@ -66,7 +70,7 @@
 </head>
 <body>
 <canvas id="c" tabindex="-1"></canvas>
-<div id="l">Loading... 0%</div>
+<div id="l">読み込み中… 0%</div>
 <div id="mm" hidden>
   <div class="box" role="dialog" aria-labelledby="mm-title">
     <h2 id="mm-title">オンライン対戦</h2>
@@ -83,7 +87,7 @@
 </div>
 <div id="pad" aria-hidden="true">
   <div class="grp l">
-    <button data-k="hold">HOLD</button>
+    <button data-k="hold">ホールド</button>
     <button data-k="soft" class="big">▼</button>
     <button data-k="left" class="big">◀</button>
     <button data-k="right" class="big">▶</button>
@@ -91,9 +95,9 @@
   <div class="grp r">
     <button data-k="ccw" class="big">↺</button>
     <button data-k="cw" class="big">↻</button>
-    <button data-k="hard" class="drop">DROP</button>
+    <button data-k="hard" class="drop">落とす</button>
   </div>
-  <button data-k="sp" class="sp">SPECIAL</button>
+  <button data-k="sp" class="sp">必殺技</button>
   <button data-k="pause" class="pause">II</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -110,7 +114,7 @@
     codeUrl: 'Build/blockdrop-web.wasm',
     streamingAssetsUrl: 'StreamingAssets',
     companyName: 'BlockDrop', productName: 'BlockDrop', productVersion: '1.0',
-  }, p => { l.textContent = 'Loading... ' + Math.round(p * 100) + '%'; })
+  }, p => { l.textContent = '読み込み中… ' + Math.round(p * 100) + '%'; })
   .then(u => { window.unityInstance = u; l.remove(); c.focus(); window.BlockDropPad.onUnityReady(); })
   .catch(e => { l.textContent = String(e); });
   c.addEventListener('pointerdown', () => c.focus());
