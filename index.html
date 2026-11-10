@@ -9,11 +9,43 @@
   #c { width: 100vw; height: 100vh; display: block; outline: none; }
   #l { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
        color: #7fd8ff; font: 600 20px system-ui, sans-serif; }
+  #mm { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+        background: rgba(4, 6, 12, 0.55); font-family: system-ui, sans-serif; }
+  #mm[hidden] { display: none; }
+  #mm .box { width: min(420px, calc(100vw - 32px)); box-sizing: border-box; padding: 28px 28px 22px;
+             background: #141a2b; border: 1px solid #3a4468; border-radius: 14px; color: #e8ecff;
+             box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  #mm h2 { margin: 0 0 6px; font-size: 22px; color: #ffbfd6; }
+  #mm .sub { margin: 0 0 18px; font-size: 14px; color: #9aa3c7; line-height: 1.5; }
+  #mm input { width: 100%; box-sizing: border-box; padding: 12px 14px; font-size: 18px; border-radius: 8px;
+              border: 1px solid #3a4468; background: #0b0f1c; color: #fff; outline: none; }
+  #mm input:focus { border-color: #7fd8ff; }
+  #mm .row { display: flex; gap: 10px; margin-top: 14px; }
+  #mm button { flex: 1; padding: 11px; font-size: 15px; font-weight: 600; border-radius: 8px; cursor: pointer;
+               border: 1px solid #7fd8ff; background: #7fd8ff; color: #0b0f1c; }
+  #mm button.ghost { background: transparent; color: #9aa3c7; border-color: #3a4468; }
+  #mm button:disabled { opacity: .5; cursor: default; }
+  #mm-status { min-height: 1.5em; margin: 14px 0 0; font-size: 14px; color: #c9d2ff; white-space: pre-line; line-height: 1.5; }
+  #mm-status.err { color: #ff8f9f; }
 </style>
 </head>
 <body>
 <canvas id="c" tabindex="-1"></canvas>
 <div id="l">Loading... 0%</div>
+<div id="mm" hidden>
+  <div class="box" role="dialog" aria-labelledby="mm-title">
+    <h2 id="mm-title">オンライン対戦</h2>
+    <p class="sub">相手と同じ合言葉を入力すると、つながります。</p>
+    <input id="mm-input" maxlength="40" placeholder="合言葉（例：sakura42）" autocomplete="off">
+    <div class="row">
+      <button id="mm-go">マッチング開始</button>
+      <button id="mm-cancel" class="ghost">キャンセル</button>
+    </div>
+    <p id="mm-status"></p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="net.js"></script>
 <script src="Build/blockdrop-web.loader.js"></script>
 <script>
   const c = document.getElementById('c'), l = document.getElementById('l');
@@ -24,9 +56,9 @@
     streamingAssetsUrl: 'StreamingAssets',
     companyName: 'BlockDrop', productName: 'BlockDrop', productVersion: '1.0',
   }, p => { l.textContent = 'Loading... ' + Math.round(p * 100) + '%'; })
-  .then(() => { l.remove(); c.focus(); })
+  .then(u => { window.unityInstance = u; l.remove(); c.focus(); })
   .catch(e => { l.textContent = String(e); });
-  window.addEventListener('pointerdown', () => c.focus());
+  c.addEventListener('pointerdown', () => c.focus());
 </script>
 </body>
 </html>
