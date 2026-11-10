@@ -30,10 +30,19 @@
   #pad button.drop { grid-column: span 2; background: rgba(255, 143, 180, 0.16); border-color: rgba(255, 143, 180, 0.55); color: #ffe0ea; }
   #pad button.on { background: rgba(127, 216, 255, 0.5); transform: scale(0.96); }
   #pad button.drop.on { background: rgba(255, 143, 180, 0.5); }
+  #pad .sp { position: fixed; right: calc(12px + env(safe-area-inset-right));
+             bottom: calc(12px + env(safe-area-inset-bottom) + 2 * var(--b) + 2 * var(--g));
+             width: calc(2 * var(--b) + var(--g)); height: calc(var(--b) * 0.62); border-radius: 14px;
+             background: linear-gradient(90deg, rgba(255,120,160,.35), rgba(255,220,90,.35), rgba(120,220,255,.35), rgba(190,140,255,.35));
+             border-color: rgba(255,255,255,.6); color: #fff; letter-spacing: .08em; }
+  #pad .sp.on { background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff); color: #111; }
   #pad .pause { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: calc(10px + env(safe-area-inset-right));
                 width: 44px; height: 44px; border-radius: 12px; font-size: 16px; }
   #l { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-       color: #7fd8ff; font: 600 20px system-ui, sans-serif; }
+       font: 800 22px system-ui, sans-serif; letter-spacing: .06em;
+       background: linear-gradient(90deg, #ff78a0, #ffdc5a, #78dcff, #be8cff, #ff78a0); background-size: 200% 100%;
+       -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 1.5s linear infinite; }
+  @keyframes shine { to { background-position: 200% 0; } }
   #mm { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
         background: rgba(4, 6, 12, 0.55); font-family: system-ui, sans-serif; }
   #mm[hidden] { display: none; }
@@ -50,6 +59,7 @@
                border: 1px solid #7fd8ff; background: #7fd8ff; color: #0b0f1c; }
   #mm button.ghost { background: transparent; color: #9aa3c7; border-color: #3a4468; }
   #mm button:disabled { opacity: .5; cursor: default; }
+  #mm button[hidden] { display: none; }
   #mm-status { min-height: 1.5em; margin: 14px 0 0; font-size: 14px; color: #c9d2ff; white-space: pre-line; line-height: 1.5; }
   #mm-status.err { color: #ff8f9f; }
 </style>
@@ -60,8 +70,10 @@
 <div id="mm" hidden>
   <div class="box" role="dialog" aria-labelledby="mm-title">
     <h2 id="mm-title">オンライン対戦</h2>
-    <p class="sub">相手と同じ合言葉を入力すると、つながります。</p>
-    <input id="mm-input" maxlength="40" placeholder="合言葉（例：sakura42）" autocomplete="off">
+    <p class="sub" id="mm-sub">相手と同じ合言葉を入力すると、つながります。</p>
+    <div id="mm-phrase">
+      <input id="mm-input" maxlength="40" placeholder="合言葉（例：sakura42）" autocomplete="off">
+    </div>
     <div class="row">
       <button id="mm-go">マッチング開始</button>
       <button id="mm-cancel" class="ghost">キャンセル</button>
@@ -81,9 +93,12 @@
     <button data-k="cw" class="big">↻</button>
     <button data-k="hard" class="drop">DROP</button>
   </div>
+  <button data-k="sp" class="sp">SPECIAL</button>
   <button data-k="pause" class="pause">II</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script src="lobby.js"></script>
 <script src="net.js"></script>
 <script src="pad.js"></script>
 <script src="Build/blockdrop-web.loader.js"></script>
