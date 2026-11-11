@@ -157,6 +157,9 @@ var Module=typeof unityFramework!="undefined"?unityFramework:{};var readyPromise
     for (var i = 0; i < btns.length; i++) bindPad(btns[i]);
     bindDialog();
 
+    // スマホでは、どのページに置かれていてもゲーム画面を全画面に広げる
+    if (isTouch) goFullOnMobile();
+
     // ゲーム画面がキー入力のフォーカスを受け取れるようにする（ページによっては tabindex が無い）
     var gc = getCanvas();
     if (gc) {
@@ -171,6 +174,46 @@ var Module=typeof unityFramework!="undefined"?unityFramework:{};var readyPromise
     setInterval(syncOverlay, 500);
     var c = getCanvas();
     if (c && window.ResizeObserver) new ResizeObserver(syncOverlay).observe(c);
+  }
+
+  // ---------------------------------------------------------------
+  // スマホ用の全画面表示
+  // unityroom などではゲーム画面が横長の固定サイズで置かれ、縦持ちのスマホだと小さすぎるため、
+  // ゲーム画面（canvas）を画面いっぱいに固定表示する。描画解像度も画面サイズに合わせる。
+  var FULL_CSS = [
+    'html.bd-mobile,html.bd-mobile body{margin:0!important;padding:0!important;overflow:hidden!important;background:#0a0d17!important;',
+    ' touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}',
+    'canvas.bd-full{position:fixed!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;',
+    ' width:100vw!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;',
+    ' min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;transform:none!important;',
+    ' z-index:2147483000!important;background:#0a0d17!important}',
+    '#bd-ui{z-index:2147483001!important}',
+  ].join('\n');
+
+  function goFullOnMobile() {
+    var c = getCanvas();
+    if (!c) { setTimeout(goFullOnMobile, 100); return; }
+    var st = document.createElement('style');
+    st.textContent = FULL_CSS;
+    document.head.appendChild(st);
+    document.documentElement.classList.add('bd-mobile');
+    // 外側の要素に transform などがあると position:fixed が効かないので、その時は canvas を body 直下へ移す
+    var p = c.parentElement, blocked = false;
+    while (p && p !== document.body && p !== document.documentElement) {
+      var cs = getComputedStyle(p);
+      if ((cs.transform && cs.transform !== 'none') || (cs.filter && cs.filter !== 'none') ||
+          (cs.perspective && cs.perspective !== 'none') || /paint|layout|strict|content/.test(cs.contain || '')) { blocked = true; break; }
+      p = p.parentElement;
+    }
+    if (blocked) document.body.appendChild(c);
+    c.classList.add('bd-full');
+    // 描画解像度を表示サイズに合わせる（ページ側が固定解像度にしていても）
+    try { if (typeof Module !== 'undefined') Module.matchWebGLToCanvasSize = true; } catch (e) {}
+    // 拡大表示されたページで固まらないよう、拡大を禁止する
+    var vp = document.querySelector('meta[name="viewport"]');
+    if (!vp) { vp = document.createElement('meta'); vp.name = 'viewport'; document.head.appendChild(vp); }
+    vp.content = 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';
+    window.scrollTo(0, 0);
   }
 
   // ---------------------------------------------------------------
